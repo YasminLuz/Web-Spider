@@ -1,0 +1,68 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Net;
+
+namespace ConsoleApp1
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+
+            var print = GetPrincipalSiteBitcoin();
+            PrintResult(print);
+
+
+        }
+
+        private string GetPrincipalSiteBitcoin()
+        {
+            var web = new WebClient();
+
+            var url = "https://www.mercadobitcoin.com.br/";
+
+            return web.DownloadString(url);
+
+        }
+
+        private string GetTickerSiteBitcoin()
+        {
+            var web = new WebClient();
+
+            var url = "https://www.mercadobitcoin.net/api/BTC/ticker/";
+
+            return web.DownloadString(url);
+
+        }
+
+        private string GetOrderbookSiteBitcoin()
+        {
+            var web = new WebClient();
+
+            var url = "https://www.mercadobitcoin.net/api/BTC/orderbook/";
+
+            return web.DownloadString(url);
+
+        }
+
+        private string GetTradesrSiteBitcoin()
+        {
+            var web = new WebClient();
+
+            var url = "https://www.mercadobitcoin.net/api/BTC/trades/";
+
+            return web.DownloadString(url);
+
+        }
+
+        public static void PrintResult(string url)
+        {
+            Console.WriteLine(url);
+            Console.ReadKey();
+        }
+
+    }
+}
