@@ -1,68 +1,46 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Net;
 
 namespace ConsoleApp1
 {
     class Program
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
+            var currency = new string[] { "/BTC", "/LTC", "/BCH", "/XRP ", "/ETH"};
+            var domain = new string[] { "/ticker", "/orderbook", "/trades"};
+            var bar = "/";
 
-            var print = GetPrincipalSiteBitcoin();
-            PrintResult(print);
+            var html = GetSiteBitcoin("https://www.mercadobitcoin.net/api"+ currency[0] + domain[0] + bar);
 
-
+            PrintResult(html);
         }
 
-        private string GetPrincipalSiteBitcoin()
-        {
-            var web = new WebClient();
-
-            var url = "https://www.mercadobitcoin.com.br/";
-
-            return web.DownloadString(url);
-
-        }
-
-        private string GetTickerSiteBitcoin()
+        private static string GetSiteBitcoin(string url)
         {
             var web = new WebClient();
 
-            var url = "https://www.mercadobitcoin.net/api/BTC/ticker/";
-
             return web.DownloadString(url);
-
         }
 
-        private string GetOrderbookSiteBitcoin()
-        {
-            var web = new WebClient();
-
-            var url = "https://www.mercadobitcoin.net/api/BTC/orderbook/";
-
-            return web.DownloadString(url);
-
-        }
-
-        private string GetTradesrSiteBitcoin()
-        {
-            var web = new WebClient();
-
-            var url = "https://www.mercadobitcoin.net/api/BTC/trades/";
-
-            return web.DownloadString(url);
-
-        }
-
-        public static void PrintResult(string url)
+        private static void PrintResult(string url)
         {
             Console.WriteLine(url);
+
             Console.ReadKey();
         }
+
+        public HttpWebRequest RequestPOST()
+        {
+            var requestWeb = WebRequest.CreateHttp("https://www.mercadobitcoin.net/api/BTC/ticker/");
+            requestWeb.Method = "GET";
+            requestWeb.ContentType = "application/x-www-form-urlencoded";
+            requestWeb.UserAgent = "RequisicaoWebDemo";
+            //requestWeb.ContentLength = dados.Length;
+
+            return requestWeb;
+        }
+
 
     }
 }
