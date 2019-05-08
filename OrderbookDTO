@@ -1,0 +1,17 @@
+using System.Runtime.Serialization;
+using System.Collections.Generic;
+
+namespace OrderbookConvertJSON
+{
+    [DataContract]
+    public class Orderbook
+    {
+        [DataMember]
+        public List<decimal> bids { get; set; }
+
+        [DataMember]
+        public List<decimal> asks { get; set; }
+
+
+    }
+}
