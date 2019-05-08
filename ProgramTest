@@ -1,21 +1,28 @@
+using Newtonsoft.Json;
 using System;
 using System.Net;
+using System.Runtime.Serialization;
 
-namespace ConsoleApp1
+namespace ConvertJSON
 {
-    class Program
+    public class Program
     {
         public static void Main(string[] args)
         {
-            var currency = new string[] { "/BTC", "/LTC", "/BCH", "/XRP ", "/ETH"};
-            var domain = new string[] { "/ticker", "/orderbook", "/trades"};
-            var bar = "/";
+            var currency = new string[] { "/BTC", "/LTC", "/BCH", "/XRP ", "/ETH" };
+            var domain = new string[] { "/ticker", "/orderbook", "/trades" };
 
-            var html = GetSiteBitcoin("https://www.mercadobitcoin.net/api"+ currency[0] + domain[0] + bar);
+            var link = "https://www.mercadobitcoin.net/api" + currency[0] + domain[0] + "/";
 
-            PrintResult(html);
+            RequestGET(link);
+            var html = GetSiteBitcoin(link);
+
+            //PrintResult(html);
+
+            Deserializer();
         }
 
+        #region Priv Methods
         private static string GetSiteBitcoin(string url)
         {
             var web = new WebClient();
@@ -30,7 +37,7 @@ namespace ConsoleApp1
             Console.ReadKey();
         }
 
-        public HttpWebRequest RequestPOST()
+        private static HttpWebRequest RequestGET(string url)
         {
             var requestWeb = WebRequest.CreateHttp("https://www.mercadobitcoin.net/api/BTC/ticker/");
             requestWeb.Method = "GET";
@@ -41,6 +48,31 @@ namespace ConsoleApp1
             return requestWeb;
         }
 
+        private static void Deserializer()
+        {
+             string json = @"{
+                                            'ticker': {
+                                                      'buy': 23680.00003000,
+                                                      'sell': 23757.39000000, 
+                                                      'high': 24000.00000000,
+                                                      'low':  22650.00000000,
+                                                      'vol': 502.00988747,
+                                                      'last': 23757.39000000,
+                                                      'date': 1557241541,
+                        
+                                                      }
+                           }";
 
-    }
-}
+            Ticker ticker = JsonConvert.DeserializeObject<Ticker>(json);
+
+            Console.WriteLine("{ticker: {buy: " + ticker.buy + ", sell: " + ticker.sell + ", high: " + ticker.high + ", low: " + ticker.low + ", vol: "
+                              + ticker.vol + ", last: " + ticker.last + ", date: " + ticker.date + "}}");
+            Console.ReadKey();
+        }
+
+        private void Serializer()
+        {
+
+        }
+
+        #endregion
