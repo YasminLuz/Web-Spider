@@ -1,0 +1,15 @@
+using System.Runtime.Serialization;
+
+namespace TradesConvertJSON
+{
+    [DataContract]
+    public class Trades
+    {
+        [DataMember]
+        public decimal buy { get; set; }
+
+        [DataMember]
+        public decimal sell { get; set; }
+
+    }
+}
