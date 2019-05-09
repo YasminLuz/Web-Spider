@@ -1,28 +1,34 @@
 using Newtonsoft.Json;
 using System;
 using System.Net;
-using System.Runtime.Serialization;
+using OrderbookConvertJSON;
+using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
 
-namespace ConvertJSON
+namespace Main
 {
     public class Program
     {
         public static void Main(string[] args)
         {
-            var currency = new string[] { "/BTC", "/LTC", "/BCH", "/XRP ", "/ETH" };
-            var domain = new string[] { "/ticker", "/orderbook", "/trades" };
+            var link = getLink(0, 2);
 
-            var link = "https://www.mercadobitcoin.net/api" + currency[0] + domain[0] + "/";
-
-            RequestGET(link);
             var html = GetSiteBitcoin(link);
 
             //PrintResult(html);
-
-            Deserializer();
+            //Serializer(t);
+            DeserializerOrder();
         }
 
         #region Priv Methods
+        private static string getLink(int c, int d)
+        {
+            var currency = new string[] { "/BTC", "/LTC", "/BCH", "/XRP ", "/ETH" };
+            var domain = new string[] { "/ticker", "/orderbook", "/trades" };
+
+            return "https://www.mercadobitcoin.net/api" + currency[c] + domain[d] + "/";
+        }
+
         private static string GetSiteBitcoin(string url)
         {
             var web = new WebClient();
@@ -37,42 +43,100 @@ namespace ConvertJSON
             Console.ReadKey();
         }
 
-        private static HttpWebRequest RequestGET(string url)
-        {
-            var requestWeb = WebRequest.CreateHttp("https://www.mercadobitcoin.net/api/BTC/ticker/");
-            requestWeb.Method = "GET";
-            requestWeb.ContentType = "application/x-www-form-urlencoded";
-            requestWeb.UserAgent = "RequisicaoWebDemo";
-            //requestWeb.ContentLength = dados.Length;
-
-            return requestWeb;
-        }
-
         private static void Deserializer()
         {
-             string json = @"{
-                                            'ticker': {
-                                                      'buy': 23680.00003000,
-                                                      'sell': 23757.39000000, 
-                                                      'high': 24000.00000000,
-                                                      'low':  22650.00000000,
-                                                      'vol': 502.00988747,
-                                                      'last': 23757.39000000,
-                                                      'date': 1557241541,
-                        
-                                                      }
-                           }";
+            string json = "";
+            
+                   json = @"{
+                              'ticker': {
+                                          'buy': 23680.00003000,
+                                          'sell': 23757.39000000, 
+                                          'high': 24000.00000000,
+                                          'low':  22650.00000000,
+                                          'vol': 502.00988747,
+                                          'last': 23757.39000000,
+                                          'date': 1557241541
+                                        }
+                             }";
+                Ticker ticker = new Ticker();
+                ticker = JsonConvert.DeserializeObject<Ticker>(json);
 
-            Ticker ticker = JsonConvert.DeserializeObject<Ticker>(json);
+                Console.WriteLine("{ticker: {buy: " + ticker.buy + ", sell: " + ticker.sell + ", high: " + ticker.high + ", low: " + ticker.low + ", vol: "
+                  + ticker.vol + ", last: " + ticker.last + ", date: " + ticker.date + "}}");
 
-            Console.WriteLine("{ticker: {buy: " + ticker.buy + ", sell: " + ticker.sell + ", high: " + ticker.high + ", low: " + ticker.low + ", vol: "
-                              + ticker.vol + ", last: " + ticker.last + ", date: " + ticker.date + "}}");
+        }
+
+        private static void DeserializerOrder()
+        {
+            string json = "" ;// = GetSiteBitcoin(getLink(0, 1));
+            
+            json = @"{
+                        'asks': [ 
+                                    [10410.00006000, 2.09190016],
+                                    [10420.00000000, 0.00997000],
+                                    [10488.99999000, 0.46634897]
+                                ],
+
+                         'bids': [
+                                    [10405.38258000, 0.00181000],
+                                    [10393.84180000, 0.08387000]
+                                 ]
+                     }";
+            
+            string strFieldString = json.Remove(json.IndexOf('[', ','));
+
+            Matrix obj = new Matrix();
+            obj = JsonConvert.DeserializeObject<Matrix>(json);
+                
+
+            foreach (var element in obj.orderbook)
+                Console.WriteLine(element);
+
+            //foreach (var element in obj.bids)
+            //    Console.WriteLine(element);
+            
+            Console.ReadKey();
+
+        }
+
+        private static void Serializer(Object obj)
+        {
+            obj = new Ticker
+            {
+                buy = 23680.00003000m,
+                sell = 23757.39000000m,
+                high = 24000.00000000m,
+                low = 22650.00000000m,
+                vol = 502.00988747m,
+                last = 23757.39000000m,
+                date = 1557241541
+
+            };
+             
+            string json = JsonConvert.SerializeObject(obj, Formatting.Indented);
+
+            Console.WriteLine("ticker:{" + json + "}");
             Console.ReadKey();
         }
 
-        private void Serializer()
-        {
 
+        private static void SerializerOrder()
+        {
+        //    Orderbook obj = new Orderbook
+        //    {
+        //        asks = { 10410.00006000, 2.09190016 };
+
+        //        bids = { 10405.38258000, 0.00181000};
+        //    };
+
+        //string json = JsonConvert.SerializeObject(obj, Formatting.Indented);
+
+        // Console.WriteLine("ticker:{" + json + "}");
+        //    Console.ReadKey();
         }
 
         #endregion
+
+
+    }
+}
