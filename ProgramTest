@@ -1,9 +1,9 @@
 using Newtonsoft.Json;
 using System;
 using System.Net;
-using OrderbookConvertJSON;
-using System.Collections.Generic;
-using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Converters;
+using System.IO;
+using static Main.Orderbook;
 
 namespace Main
 {
@@ -11,12 +11,15 @@ namespace Main
     {
         public static void Main(string[] args)
         {
-            var link = getLink(0, 2);
+            var link = getLink(0, 0);
 
             var html = GetSiteBitcoin(link);
 
-            //PrintResult(html);
-            //Serializer(t);
+            PrintResult(html);
+            Ticker t = new Ticker();
+            Serializer(t);
+            //Deserializer(t);
+            //SerializerOrder();
             DeserializerOrder();
         }
 
@@ -43,11 +46,11 @@ namespace Main
             Console.ReadKey();
         }
 
-        private static void Deserializer()
+        private static void Deserializer(Ticker ticker)
         {
             string json = "";
-            
-                   json = @"{
+
+            json = @"{
                               'ticker': {
                                           'buy': 23680.00003000,
                                           'sell': 23757.39000000, 
@@ -58,50 +61,26 @@ namespace Main
                                           'date': 1557241541
                                         }
                              }";
-                Ticker ticker = new Ticker();
-                ticker = JsonConvert.DeserializeObject<Ticker>(json);
+            ticker = new Ticker();
+            ticker = JsonConvert.DeserializeObject<Ticker>(json);
 
-                Console.WriteLine("{ticker: {buy: " + ticker.buy + ", sell: " + ticker.sell + ", high: " + ticker.high + ", low: " + ticker.low + ", vol: "
-                  + ticker.vol + ", last: " + ticker.last + ", date: " + ticker.date + "}}");
-
+            Console.WriteLine("{ticker: {buy: " + ticker.ticker.buy + ", sell: " + ticker.ticker.sell + ", high: " + ticker.ticker.high + ", low: " + ticker.ticker.low + ", vol: "
+              + ticker.ticker.vol + ", last: " + ticker.ticker.last + ", date: " + ticker.ticker.date + "}}");
+            Console.ReadKey();
         }
 
         private static void DeserializerOrder()
         {
-            string json = "" ;// = GetSiteBitcoin(getLink(0, 1));
-            
-            json = @"{
-                        'asks': [ 
-                                    [10410.00006000, 2.09190016],
-                                    [10420.00000000, 0.00997000],
-                                    [10488.99999000, 0.46634897]
-                                ],
+            string json = GetSiteBitcoin(getLink(0, 1));
+   
+            var nodeValues = JsonConvert.DeserializeObject<JsonConverted>(json);
 
-                         'bids': [
-                                    [10405.38258000, 0.00181000],
-                                    [10393.84180000, 0.08387000]
-                                 ]
-                     }";
-            
-            string strFieldString = json.Remove(json.IndexOf('[', ','));
-
-            Matrix obj = new Matrix();
-            obj = JsonConvert.DeserializeObject<Matrix>(json);
-                
-
-            foreach (var element in obj.orderbook)
-                Console.WriteLine(element);
-
-            //foreach (var element in obj.bids)
-            //    Console.WriteLine(element);
-            
             Console.ReadKey();
-
         }
 
         private static void Serializer(Object obj)
         {
-            obj = new Ticker
+            obj = new SubTicker
             {
                 buy = 23680.00003000m,
                 sell = 23757.39000000m,
@@ -109,10 +88,10 @@ namespace Main
                 low = 22650.00000000m,
                 vol = 502.00988747m,
                 last = 23757.39000000m,
-                date = 1557241541
+                date = 1557241541,
 
             };
-             
+
             string json = JsonConvert.SerializeObject(obj, Formatting.Indented);
 
             Console.WriteLine("ticker:{" + json + "}");
@@ -122,21 +101,26 @@ namespace Main
 
         private static void SerializerOrder()
         {
-        //    Orderbook obj = new Orderbook
-        //    {
-        //        asks = { 10410.00006000, 2.09190016 };
+            Orderbook order = new Orderbook();
 
-        //        bids = { 10405.38258000, 0.00181000};
-        //    };
+            JsonSerializer serializer = new JsonSerializer();
+            serializer.Converters.Add(new JavaScriptDateTimeConverter());
+            serializer.NullValueHandling = NullValueHandling.Ignore;
 
-        //string json = JsonConvert.SerializeObject(obj, Formatting.Indented);
-
-        // Console.WriteLine("ticker:{" + json + "}");
-        //    Console.ReadKey();
+            using (StreamWriter sw = new StreamWriter(@"E:\Projetos\WebDownload\ConsoleApp1\OrderbookJson.json"))
+            using (JsonWriter writer = new JsonTextWriter(sw))
+            {
+                serializer.Serialize(writer, order);
+            }
+            Console.WriteLine("serializer:{" + order + "}"); Console.ReadKey();
         }
 
         #endregion
 
 
     }
+    //https://social.msdn.microsoft.com/Forums/en-US/39402148-818d-4ee9-acc2-1d833a4635ba/jsonnet-deserialize-an-array-of-arrays?forum=csharpgeneral
+    //https://www.newtonsoft.com/json/help/html/SerializingJSON.htm
+    //https://www.google.com/search?newwindow=1&rlz=1C1SQJL_pt-BRBR835BR835&ei=e87VXO_1Gbi75OUPhsaWuAo&q=json+deserialize+complex+object+c%23&oq=deserialize+json+objeto+com&gs_l=psy-ab.1.0.0i22i30l3.814184.821956..824156...4.0..0.198.1594.0j10......0....1..gws-wiz.......0i71j0j0i203j0i13j0i13i30j0i8i13i30j33i22i29i30.RRS9orW4lNU
+    //https://www.guj.com.br/t/como-transformar-um-array-de-objetos-do-json-em-uma-list-de-objetos-em-c-usando-json-net/358847
 }
