@@ -1,11 +1,15 @@
 using System.Runtime.Serialization;
-using System.IO;
-using System.Text;
 
-namespace ConvertJSON
+namespace Main
 {
     [DataContract]
     public class Ticker
+    {
+        public SubTicker ticker;
+    }
+
+
+    public class SubTicker
     {
         [DataMember]
         public decimal buy { get; set; }
@@ -28,7 +32,7 @@ namespace ConvertJSON
         [DataMember]
         public int date { get; set; }
 
-        public Ticker()
+        public SubTicker()
         {
             this.buy = 0.0m;
             this.sell = 0.0m;
