@@ -1,32 +1,6 @@
-using System.Runtime.Serialization;
-using System.Collections;
-
-namespace OrderbookConvertJSON
-{
-    [DataContract]
-    public class Matrix
-    {
-        [DataMember]
-        public ArrayList orderbook { get; set; }
-
-    }
-
-    [DataContract]
-    public class Orderbook
-    {
-        [DataMember]
-        public decimal[] bids { get; set; } 
-
-        [DataMember]
-        public decimal[] asks { get; set; }
-
-
-        public Orderbook()
+    public class JsonConverted
         {
-            this.bids = new decimal[2];
-            this.asks = new decimal[2];
+            public double[][] asks { get; set; }
+
+            public double[][] bids { get; set; }
         }
-
-
-    }
-}
