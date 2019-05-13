@@ -1,6 +1,12 @@
-    public class JsonConverted
+namespace Main
+{
+    public class Orderbook
+    {
+        public class JsonConverted
         {
             public double[][] asks { get; set; }
 
             public double[][] bids { get; set; }
         }
+    }
+}
