@@ -1,15 +1,30 @@
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-namespace TradesConvertJSON
+namespace Main
 {
     [DataContract]
     public class Trades
     {
-        [DataMember]
-        public decimal buy { get; set; }
+        public List<SubTrades> trades { get; set; }
 
-        [DataMember]
-        public decimal sell { get; set; }
+        [DataContract]
+        public class SubTrades
+        {
+            [DataMember]
+            public int tid { get; set; }
 
+            [DataMember]
+            public long date { get; set; }
+
+            [DataMember]
+            public string type { get; set; }
+
+            [DataMember]
+            public decimal price { get; set; }
+
+            [DataMember]
+            public decimal amount { get; set; }
+        }
     }
 }
