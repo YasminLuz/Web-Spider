@@ -13,20 +13,25 @@ namespace Main
         {
             for(int option = 0; option < 3; option++)
             {
-                if (option == 1)
+                var link = getLink(0, option);
+
+                var html = GetSiteBitcoin(link);
+                if (option == 0)
                 {
-                    DeserializerTicker();
-                    SerializerTicker();
-                } else if(option == 2)
+                    var desTicker = DeserializerTicker();
+                    SerializerTicker(desTicker);
+
+                } else if(option == 1)
                 {
-                    DeserializerOrderbook();
-                    SerializerOrderbook();
+                    var desOrderbook = DeserializerOrderbook();
+                    SerializerOrderbook(desOrderbook);
                 }
                 else
                 {
-                    DeserializerTrades();
-                    SerializerTrades();
+                    var desTrades = DeserializerTrades();
+                    SerializerTrades(desTrades);
                 }
+              
             }          
         }
 
@@ -57,9 +62,9 @@ namespace Main
         {
             string json = GetSiteBitcoin(getLink(0, 0));
 
-            var nodeValues = JsonConvert.DeserializeObject<Ticker>(json);
+            var ticker = JsonConvert.DeserializeObject<Ticker>(json);
 
-            return nodeValues;
+            return ticker;
         }
 
         private static JsonConverted DeserializerOrderbook()
@@ -80,37 +85,27 @@ namespace Main
             return nodeValues;
         }
 
-        private static string SerializerTicker()
+        private static string SerializerTicker(Ticker desTicker)
         {
-            Ticker obj = DeserializerTicker();
+            string json = JsonConvert.SerializeObject(desTicker, Formatting.Indented);
+            
+            return json + "\n";
+        }
 
-            string json = JsonConvert.SerializeObject(obj, Formatting.Indented);
+        private static string SerializerOrderbook(JsonConverted desOrderbook)
+        {
+            string json = Newtonsoft.Json.JsonConvert.SerializeObject(desOrderbook);
 
             return json + "\n";
         }
 
-        private static string SerializerOrderbook()
+        private static string SerializerTrades(List<SubTrades> desTrades)
         {
-            JsonConverted list = DeserializerOrderbook();
-
-            string json = Newtonsoft.Json.JsonConvert.SerializeObject(list);
-
-            return json + "\n";
-        }
-
-        private static string SerializerTrades()
-        {
-            List<SubTrades> tradesList = DeserializerTrades();
-
-            string json = Newtonsoft.Json.JsonConvert.SerializeObject(tradesList);
+            string json = Newtonsoft.Json.JsonConvert.SerializeObject(desTrades);
 
             return json + "\n";
         }
 
         #endregion
     }
-    //https://social.msdn.microsoft.com/Forums/en-US/39402148-818d-4ee9-acc2-1d833a4635ba/jsonnet-deserialize-an-array-of-arrays?forum=csharpgeneral
-    //https://www.newtonsoft.com/json/help/html/SerializingJSON.htm
-    //https://www.google.com/search?newwindow=1&rlz=1C1SQJL_pt-BRBR835BR835&ei=e87VXO_1Gbi75OUPhsaWuAo&q=json+deserialize+complex+object+c%23&oq=deserialize+json+objeto+com&gs_l=psy-ab.1.0.0i22i30l3.814184.821956..824156...4.0..0.198.1594.0j10......0....1..gws-wiz.......0i71j0j0i203j0i13j0i13i30j0i8i13i30j33i22i29i30.RRS9orW4lNU
-    //https://www.guj.com.br/t/como-transformar-um-array-de-objetos-do-json-em-uma-list-de-objetos-em-c-usando-json-net/358847
 }
