@@ -8,7 +8,6 @@ namespace Main
         public SubTicker ticker;
     }
 
-
     public class SubTicker
     {
         [DataMember]
@@ -31,17 +30,5 @@ namespace Main
 
         [DataMember]
         public int date { get; set; }
-
-        public SubTicker()
-        {
-            this.buy = 0.0m;
-            this.sell = 0.0m;
-            this.high = 0.0m;
-            this.low = 0.0m;
-            this.vol = 0.0m;
-            this.last = 0.0m;
-            this.date = 0;
-        }
-
     }
 }
