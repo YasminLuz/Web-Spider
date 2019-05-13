@@ -13,10 +13,6 @@ namespace Main
         {
             for(int option = 0; option < 3; option++)
             {
-                var link = getLink(0, option);
-
-                var html = GetSiteBitcoin(link);
-
                 if (option == 1)
                 {
                     DeserializerTicker();
