@@ -1,0 +1,120 @@
+using Newtonsoft.Json;
+using System;
+using System.Net;
+using System.Collections.Generic;
+using static Main.Orderbook;
+using static Main.Trades;
+
+namespace Main
+{
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            for(int option = 0; option < 3; option++)
+            {
+                var link = getLink(0, option);
+
+                var html = GetSiteBitcoin(link);
+
+                if (option == 1)
+                {
+                    DeserializerTicker();
+                    SerializerTicker();
+                } else if(option == 2)
+                {
+                    DeserializerOrderbook();
+                    SerializerOrderbook();
+                }
+                else
+                {
+                    DeserializerTrades();
+                    SerializerTrades();
+                }
+            }          
+        }
+
+        #region Priv Methods
+        private static string getLink(int c, int d)
+        {
+            var currency = new string[] { "/BTC", "/LTC", "/BCH", "/XRP ", "/ETH" };
+            var domain = new string[] { "/ticker", "/orderbook", "/trades" };
+
+            return "https://www.mercadobitcoin.net/api" + currency[c] + domain[d] + "/";
+        }
+
+        private static string GetSiteBitcoin(string url)
+        {
+            var web = new WebClient();
+
+            return web.DownloadString(url);
+        }
+
+        private static void PrintResult(string url)
+        {
+            Console.WriteLine(url);
+
+            Console.ReadKey();
+        }
+
+        private static Ticker DeserializerTicker()
+        {
+            string json = GetSiteBitcoin(getLink(0, 0));
+
+            var nodeValues = JsonConvert.DeserializeObject<Ticker>(json);
+
+            return nodeValues;
+        }
+
+        private static JsonConverted DeserializerOrderbook()
+        {
+            string json = GetSiteBitcoin(getLink(0, 1));
+   
+            var nodeValues = JsonConvert.DeserializeObject<JsonConverted>(json);
+
+            return nodeValues;
+        }
+
+        private static List<SubTrades> DeserializerTrades()
+        {
+            string json = GetSiteBitcoin(getLink(0, 2));
+
+            var nodeValues = JsonConvert.DeserializeObject<List<SubTrades>>(json);
+
+            return nodeValues;
+        }
+
+        private static string SerializerTicker()
+        {
+            Ticker obj = DeserializerTicker();
+
+            string json = JsonConvert.SerializeObject(obj, Formatting.Indented);
+
+            return json + "\n";
+        }
+
+        private static string SerializerOrderbook()
+        {
+            JsonConverted list = DeserializerOrderbook();
+
+            string json = Newtonsoft.Json.JsonConvert.SerializeObject(list);
+
+            return json + "\n";
+        }
+
+        private static string SerializerTrades()
+        {
+            List<SubTrades> tradesList = DeserializerTrades();
+
+            string json = Newtonsoft.Json.JsonConvert.SerializeObject(tradesList);
+
+            return json + "\n";
+        }
+
+        #endregion
+    }
+    //https://social.msdn.microsoft.com/Forums/en-US/39402148-818d-4ee9-acc2-1d833a4635ba/jsonnet-deserialize-an-array-of-arrays?forum=csharpgeneral
+    //https://www.newtonsoft.com/json/help/html/SerializingJSON.htm
+    //https://www.google.com/search?newwindow=1&rlz=1C1SQJL_pt-BRBR835BR835&ei=e87VXO_1Gbi75OUPhsaWuAo&q=json+deserialize+complex+object+c%23&oq=deserialize+json+objeto+com&gs_l=psy-ab.1.0.0i22i30l3.814184.821956..824156...4.0..0.198.1594.0j10......0....1..gws-wiz.......0i71j0j0i203j0i13j0i13i30j0i8i13i30j33i22i29i30.RRS9orW4lNU
+    //https://www.guj.com.br/t/como-transformar-um-array-de-objetos-do-json-em-uma-list-de-objetos-em-c-usando-json-net/358847
+}
