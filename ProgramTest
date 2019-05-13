@@ -1,26 +1,29 @@
 using Newtonsoft.Json;
 using System;
 using System.Net;
-using Newtonsoft.Json.Converters;
-using System.IO;
 using static Main.Orderbook;
+using System.Collections.Generic;
+using static Main.Trades;
 
 namespace Main
 {
     public class Program
     {
+        enum OptDomains { TICKER = 1, ORDERBOOK = 2, TRADES = 3};
+
         public static void Main(string[] args)
         {
-            var link = getLink(0, 0);
+            var link = getLink(0, OptDomains.ORDERBOOK);
 
             var html = GetSiteBitcoin(link);
 
-            PrintResult(html);
-            Ticker t = new Ticker();
-            Serializer(t);
+            //PrintResult(html);
+            //Serializer(t);
             //Deserializer(t);
-            //SerializerOrder();
-            DeserializerOrder();
+            SerializerOrder();
+            //DeserializerOrder();
+            //DeserializerTrades();
+            //SerializerTrades();
         }
 
         #region Priv Methods
@@ -69,18 +72,31 @@ namespace Main
             Console.ReadKey();
         }
 
-        private static void DeserializerOrder()
+        private static JsonConverted DeserializerOrder()
         {
             string json = GetSiteBitcoin(getLink(0, 1));
    
             var nodeValues = JsonConvert.DeserializeObject<JsonConverted>(json);
 
-            Console.ReadKey();
+            return nodeValues;
         }
 
-        private static void Serializer(Object obj)
+        private static List<SubTrades> DeserializerTrades()
         {
-            obj = new SubTicker
+            string json = GetSiteBitcoin(getLink(0, 2));
+
+            var nodeValues = JsonConvert.DeserializeObject<List<SubTrades>>(json);
+
+            Console.WriteLine(nodeValues[0]);
+
+            Console.ReadKey();
+
+            return nodeValues;
+        }
+
+        private static void Serializer()
+        {
+            SubTicker obj = new SubTicker
             {
                 buy = 23680.00003000m,
                 sell = 23757.39000000m,
@@ -88,8 +104,7 @@ namespace Main
                 low = 22650.00000000m,
                 vol = 502.00988747m,
                 last = 23757.39000000m,
-                date = 1557241541,
-
+                date = 1557241541
             };
 
             string json = JsonConvert.SerializeObject(obj, Formatting.Indented);
@@ -98,29 +113,24 @@ namespace Main
             Console.ReadKey();
         }
 
-
         private static void SerializerOrder()
         {
-            Orderbook order = new Orderbook();
+            JsonConverted list = DeserializerOrder();
 
-            JsonSerializer serializer = new JsonSerializer();
-            serializer.Converters.Add(new JavaScriptDateTimeConverter());
-            serializer.NullValueHandling = NullValueHandling.Ignore;
+            string json = Newtonsoft.Json.JsonConvert.SerializeObject(list);
 
-            using (StreamWriter sw = new StreamWriter(@"E:\Projetos\WebDownload\ConsoleApp1\OrderbookJson.json"))
-            using (JsonWriter writer = new JsonTextWriter(sw))
-            {
-                serializer.Serialize(writer, order);
-            }
-            Console.WriteLine("serializer:{" + order + "}"); Console.ReadKey();
+            Console.WriteLine("order:{" + json + "}");
         }
 
+        private static void SerializerTrades()
+        {
+            List<SubTrades> tradesList = DeserializerTrades();
+
+            string json = Newtonsoft.Json.JsonConvert.SerializeObject(tradesList);
+       
+            Console.WriteLine("trades:{" + json + "}");
+        }
         #endregion
 
 
     }
-    //https://social.msdn.microsoft.com/Forums/en-US/39402148-818d-4ee9-acc2-1d833a4635ba/jsonnet-deserialize-an-array-of-arrays?forum=csharpgeneral
-    //https://www.newtonsoft.com/json/help/html/SerializingJSON.htm
-    //https://www.google.com/search?newwindow=1&rlz=1C1SQJL_pt-BRBR835BR835&ei=e87VXO_1Gbi75OUPhsaWuAo&q=json+deserialize+complex+object+c%23&oq=deserialize+json+objeto+com&gs_l=psy-ab.1.0.0i22i30l3.814184.821956..824156...4.0..0.198.1594.0j10......0....1..gws-wiz.......0i71j0j0i203j0i13j0i13i30j0i8i13i30j33i22i29i30.RRS9orW4lNU
-    //https://www.guj.com.br/t/como-transformar-um-array-de-objetos-do-json-em-uma-list-de-objetos-em-c-usando-json-net/358847
-}
